@@ -1,0 +1,3 @@
+CHROMECAST_NAME = ''
+DASH_HMAC = ''
+BRIDGE_IP = ''
