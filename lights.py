@@ -1,39 +1,16 @@
 import asyncio
+import logging
 import datetime
-from phue import Bridge
 import csv
+
+from phue import Bridge
 import pychromecast
 
 import settings
 
+logger = logging.getLogger(__name__)
 
-def start_video():
-    print('You used to you used to...')
-    cast = pychromecast.get_chromecast(friendly_name=settings.CHROMECAST_NAME)
-    cast.wait()
-    mc = cast.media_controller
-    mc.play_media('https://osf.io/zqnyu/?action=download&direct&mode=render', 'video/mp4')
-
-
-def setup_hue():
-    hue = settings.BRIDGE_IP
-    return Bridge(hue)
-
-
-def change_light(bridge, color):
-    lights = bridge.get_light_objects(mode='id').values()
-    for light in lights:
-        light.xy = HUE_COLORS[color]
-
-    print('*{}*'.format(color.upper()))
-
-
-def create_hue_cues():
-    with open('timecolor.csv') as f:
-        data = [tuple(line) for line in csv.reader(f)]
-    data.pop(0)
-    return [(int(item[0]), item[1].strip()) for item in data]
-
+VIDEO_FILE = 'https://osf.io/zqnyu/?action=download&direct&mode=render'
 HUE_COLORS = dict(
     goldenrod=[0.5136, 0.4444],
     green=[0.214, 0.709],
@@ -57,19 +34,44 @@ HUE_COLORS = dict(
     slateblue=[0.2218, 0.1444],
     beige=[0.3402, 0.356]
 )
+# CSV containing timing for color changes
+CUE_FILE = 'timecolor.csv'
+def _create_hue_cues():
+    with open(CUE_FILE) as f:
+        reader = csv.reader(f)
+        next(reader)  # Skip header
+        data = [(int(time), color.strip()) for time, color in reader]
+    return data
+# Maps timestamps (seconds) => color names (strings)
+HUE_CUES = _create_hue_cues()
+# Delay in seconds to correct for Chromecast connection time
+DELAY = 3
 
-HUE_CUES = create_hue_cues()
 
+def start_video():
+    logger.debug('Starting video')
+    cast = pychromecast.get_chromecast(friendly_name=settings.CHROMECAST_NAME)
+    cast.wait()
+    mc = cast.media_controller
+    mc.play_media(VIDEO_FILE, 'video/mp4')
+
+
+def setup_hue():
+    hue = settings.BRIDGE_IP
+    return Bridge(hue)
+
+def change_light(bridge, color):
+    lights = bridge.get_light_objects(mode='id').values()
+    logger.info('Changing color: {}'.format(color))
+    for light in lights:
+        light.xy = HUE_COLORS[color]
 
 def main():
     loop = asyncio.get_event_loop()
     start_video()
     bridge = setup_hue()
-    # start_time = loop.time()
-
-    for delay, color in HUE_CUES:
-        loop.call_later(delay + 3, change_light, bridge, color)
-
+    for time, color in HUE_CUES:
+        loop.call_later(time + DELAY, change_light, bridge, color)
     loop.run_forever()
     loop.close()
 
