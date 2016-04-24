@@ -2,12 +2,17 @@ import asyncio
 import datetime
 from phue import Bridge
 import csv
+import pychromecast
 
 import settings
 
 
 def start_video():
     print('You used to you used to...')
+    cast = pychromecast.get_chromecast(friendly_name=settings.CHROMECAST_NAME)
+    cast.wait()
+    mc = cast.media_controller
+    mc.play_media('https://osf.io/zqnyu/?action=download&direct&mode=render', 'video/mp4')
 
 
 def setup_hue():
@@ -63,7 +68,7 @@ def main():
     # start_time = loop.time()
 
     for delay, color in HUE_CUES:
-        loop.call_later(delay, change_light, bridge, color)
+        loop.call_later(delay + 3, change_light, bridge, color)
 
     loop.run_forever()
     loop.close()
