@@ -2,7 +2,7 @@
 
 Playing hotline bling with dash buttons python chromecast and magic
 
-Concieved with TONS of help from this blog post: 
+Conceived with TONS of help from this blog post: 
 https://medium.com/@edwardbenson/how-i-hacked-amazon-s-5-wifi-button-to-track-baby-data-794214b0bdd8
 
 ----------
