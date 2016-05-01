@@ -2,15 +2,16 @@
 
 Playing hotline bling with dash buttons, python, chromecast, and magic
 
-Conceived with TONS of help from this blog post: 
+Conceived with TONS of help from this blog post:
 https://medium.com/@edwardbenson/how-i-hacked-amazon-s-5-wifi-button-to-track-baby-data-794214b0bdd8
 
 ----------
 
-### setup
-- ```pip install -r requirements.txt```
-- ```cp local-dist.py local.py```
-- Set your Dash button HMAC, bridge IP and chromecast friendly name in local settings
+## Setup
+
+- ``pip install -r requirements.txt``
+- ``cp .env.example .env``
+- Set your Dash button HMAC, bridge IP and chromecast friendly name in .env.
 
 ## New feature:
 ### Play hotline bling with your HUE lights to match the video
