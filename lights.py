@@ -76,4 +76,8 @@ def main():
     loop.close()
 
 if __name__ == "__main__":
+    logging.basicConfig(
+        format='[%(name)s]  %(levelname)s: %(message)s',
+        level=getattr(logging, settings.LOG_LEVEL)
+    )
     main()
