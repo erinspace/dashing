@@ -1,7 +1,7 @@
-import asyncio
-import logging
-import datetime
+# -*- coding: utf-8 -*-
+from time import sleep
 import csv
+import logging
 
 from phue import Bridge
 import pychromecast
@@ -67,13 +67,17 @@ def change_light(bridge, color):
         light.xy = HUE_COLORS[color]
 
 def main():
-    loop = asyncio.get_event_loop()
     start_video()
     bridge = setup_hue()
-    for time, color in HUE_CUES:
-        loop.call_later(time + DELAY, change_light, bridge, color)
-    loop.run_forever()
-    loop.close()
+    sleep(DELAY)
+    for index, (time, color) in enumerate(HUE_CUES):
+        change_light(bridge, color)
+        try:
+            next_time = HUE_CUES[index + 1][0]
+        except IndexError:  # At last iteration
+            continue
+        delta = next_time - time
+        sleep(delta)
 
 if __name__ == "__main__":
     logging.basicConfig(
